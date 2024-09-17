@@ -38,6 +38,12 @@ def find_post(post_id: int):
     return
 
 
+def find_post_index(post_id: int):
+    for i, post in enumerate(posts):
+        if post["id"] == post_id:
+            return i
+
+
 # retrive one
 @app.get("/posts/{post_id}")
 def get_post(post_id: int):
@@ -79,4 +85,14 @@ def delete_post(post_id: int):
     if post:
         posts.remove(post)
         return {"message": f"Post {post_id} has been deleted"}
+    return {"error": "Post not found"}
+
+
+# update posts
+@app.put("/posts/{post_id}")
+def update_post(post_id: int, post: Post):
+    post_id = find_post_index(post_id)
+    if post_id is not None:
+        posts[post_id] = post.model_dump()
+        return posts[post_id]
     return {"error": "Post not found"}
