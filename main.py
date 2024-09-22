@@ -2,6 +2,8 @@ from typing import Optional
 from fastapi import FastAPI
 from fastapi.params import Body
 from pydantic import BaseModel
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 app = FastAPI()
 
@@ -10,8 +12,15 @@ class Post(BaseModel):
     title: str
     content: str
     published: bool = False
-    rating: Optional[int] = None
-    id: int = None  # id 默认为 None，服务器端生成
+
+
+# 連接postgresql
+try:
+    conn = psycopg2.connect(host="localhost", database="fastapi", user="admin", password="admin", cursor_factory=RealDictCursor)
+    cursor = conn.cursor()
+    print("Connected to the database")
+except Exception as e:
+    print(e)
 
 
 posts = [
@@ -42,6 +51,14 @@ def find_post_index(post_id: int):
     for i, post in enumerate(posts):
         if post["id"] == post_id:
             return i
+
+
+# latest post
+@app.get("/posts/latest")
+def get_latest_post():
+    if posts:
+        return posts[-1]
+    return {"error": "No posts available"}
 
 
 # retrive one

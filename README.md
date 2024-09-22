@@ -14,3 +14,9 @@ pip install -r requirements.txt
 uvicorn main:app --reload --port 3000
 
 ```
+
+## create postgres db
+```
+docker build -t my-postgres .
+docker run -d -p 5432:5432 --name my-postgres-container my-postgres
+```
